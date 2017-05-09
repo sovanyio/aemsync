@@ -66,10 +66,12 @@ class Package {
       }
 
       // Force replace or remove child if this one is parent.
-      if (existingItem.localPath.startsWith(item.localPath)) {
-        log.debug(`Removing child: ${item.localPath}`)
-        this.items.splice(i, 1)
-      }
+      // This doesn't work for individual files
+      // Should probably check if these are directories but just commenting for now
+      // if (existingItem.localPath.startsWith(item.localPath)) {
+      //   log.debug(`Removing child: ${item.localPath}`)
+      //   this.items.splice(i, 1)
+      // }
     }
 
     item.zipPath = item.zipPath || this.getZipPath(item.localPath)
