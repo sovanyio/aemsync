@@ -2,18 +2,18 @@
 
 const path = require('path')
 
-const RE_DOT = /^.*\/\..*$/
 const RE_CONTENT_PATH = /^.*\/jcr_root(\/[^\/]+){2,}$/
 const RE_SPECIAL = /^.*\/(_jcr_content|[^\/]+\.dir|\.content\.xml).*$/
-const RE_TARGET_PATH = /^.*\/target\/(.*\/)?jcr_root\/.*$/
+const RE_TARGET_PATH = /^.*\/(target|\..*)\/(.*\/)?jcr_root\/.*$/
+const IGNORED = ['.svn', '.hg', '.git']
 
 class ContentHandler {
   process (localPath) {
     let cleanPath = localPath.replace(/\\/g, '/')
     // TODO: Simplify path checking.
 
-    // Ignore dot-prefixed files and directories except ".content.xml".
-    if (cleanPath.match(RE_DOT) && !cleanPath.endsWith('.content.xml')) {
+    // Ignore CVS files.
+    if (IGNORED.some(i => cleanPath.endsWith(i))) {
       return null
     }
 

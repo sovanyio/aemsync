@@ -66,28 +66,24 @@ class Package {
       }
 
       // Force replace or remove child if this one is parent.
-      // This doesn't work for individual files
-      // Should probably check if these are directories but just commenting for now
-      // if (existingItem.localPath.startsWith(item.localPath)) {
-      //   log.debug(`Removing child: ${item.localPath}`)
-      //   this.items.splice(i, 1)
-      // }
+      if (existingItem.localPath.startsWith(item.localPath)) {
+        log.debug(`Removing child: ${item.localPath}`)
+        this.items.splice(i, 1)
+      }
     }
 
     item.zipPath = item.zipPath || this.getZipPath(item.localPath)
     item.filterPath = item.filterPath || this.getFilterPath(item.zipPath)
     this.items.push(item)
 
-    this.handleContentXml(item)
-
-    return item
+    return this.handleContentXml(item)
   }
 
   /** Adds all '.content.xml' files on the item's path. */
   handleContentXml (item) {
     // Skip if '.content.xml' file.
     if (path.basename(item.localPath) === CONTENT_XML) {
-      return
+      return item
     }
 
     // Add all '.content.xml' files going up the path.
@@ -107,6 +103,8 @@ class Package {
 
       dirPath = path.dirname(dirPath)
     }
+
+    return item
   }
 
   /** Saves package. */
