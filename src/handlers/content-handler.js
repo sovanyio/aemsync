@@ -22,11 +22,6 @@ class ContentHandler {
       return null
     }
 
-    // Skip paths on 'target'
-    if (cleanPath.match(RE_TARGET_PATH)) {
-      return null
-    }
-
     // Use parent if item is 'special'.
     if (cleanPath.match(RE_SPECIAL)) {
       return this.process(path.dirname(localPath))
