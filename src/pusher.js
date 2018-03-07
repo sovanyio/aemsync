@@ -5,6 +5,7 @@ const ContentHandler = require('./handlers/content-handler.js')
 const Package = require('./package.js')
 const Sender = require('./sender.js')
 const log = require('./log.js')
+const psList = require('ps-list')
 
 /** Pushes changes to AEM. */
 class Pusher {
@@ -89,13 +90,30 @@ class Pusher {
       log.group()
       this.lock = this.targets.length
       pack.save(packagePath => {
-        // Send the saved package.
-        this.sender.send(packagePath, (err, host, delta, time) => {
-          let prefix = `Deploying to [${chalk.yellow(host)}] in ${delta} ms at ${time}`
-          err ? log.info(`${prefix}: ${chalk.red(err)}`) : log.info(`${prefix}: ${chalk.green('OK')}`)
-          this.onPushEnd(err, host)
-          finalize()
-        })
+        psList().then(data => {
+            const isMavenRunning = data.filter(proc => {
+                return proc.cmd.match(/maven/i)
+            });
+
+            if (isMavenRunning.length) {
+                log.info(`${chalk.red('Refusing to sync due to detected maven process')}`)
+
+                // Finalize for each target since we're skipping, so we aren't locked
+                this.targets.map(() => finalize());
+            } else {
+                // Send the saved package.
+                this.sender.send(packagePath, (err, host, delta, time) => {
+                  let prefix = `Deploying to [${chalk.yellow(host)}] in ${delta} ms at ${time}`
+                  err ? log.info(`${prefix}: ${chalk.red(err)}`) : log.info(`${prefix}: ${chalk.green('OK')}`)
+                  this.onPushEnd(err, host)
+                  finalize()
+                })
+            }
+        }).catch(err => {
+          log.error(err);
+          finalize(err)
+        });
+
       })
     } catch (err) {
       log.error(err)

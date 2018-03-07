@@ -25,6 +25,7 @@
     "graceful-fs": "^4.1.11",
     "micromatch": "^3.0.3",
     "minimist": "^1.2.0",
+    "ps-list": "^4.0.0",
     "simple-watcher": "^3.0.0"
   },
   "bin": {
